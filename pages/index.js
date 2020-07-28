@@ -1,33 +1,16 @@
+import { useState } from 'react'
 import Head from 'next/head'
-import { useEffect, useState } from 'react'
-import { gql } from '@apollo/client'
 import Header from '../containers/Header/Header'
 import Footer from '../containers/Footer/Footer'
-import Post from '../containers/Post/Post'
-
-import client from '../utils/clientGraphQL'
+import Posts from '../containers/Posts/Posts'
+import Button from 'react-bootstrap/Button'
+import PostModal from '../containers/PostModal/PostModal'
 
 const Home = () => {
-  const [posts,setPosts] = useState([])
-  useEffect(()=>{
-    client
-      .query({
-        query: gql`
-          {
-            posts {
-              id
-              title
-              description
-            }
-          }
-        `,
-      })
-      .then((result) => {
-        if (result && result.data && result.data.posts){
-          setPosts(result.data.posts)
-        }
-      })
-  },[])
+  const [showPostModal,setShowPostModal] = useState(false)
+  const handleTogglePostModal = () => {
+    setShowPostModal(!showPostModal)
+  }
   return (
     <div className="container">
       <Head>
@@ -37,13 +20,13 @@ const Home = () => {
 
       <main>
         <Header />
-        <div className="posts">
-          {posts.map(post => (
-            <Post
-              post={post}
-            />
-          ))}
+        <div className="center">
+          <Button onClick={handleTogglePostModal} variant="primary">
+            Add Post
+          </Button>
+          <PostModal show={showPostModal} handleClose={handleTogglePostModal} />
         </div>
+        <Posts />
       </main>
 
       <Footer />
