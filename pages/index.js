@@ -8,8 +8,13 @@ import PostModal from '../containers/PostModal/PostModal'
 
 const Home = () => {
   const [showPostModal,setShowPostModal] = useState(false)
+  const [refreshNumber, setRefreshNumber] = useState(0)
   const handleTogglePostModal = () => {
     setShowPostModal(!showPostModal)
+  }
+  const handleSuccess = () => {
+    handleTogglePostModal()
+    setRefreshNumber(refreshNumber+1)
   }
   return (
     <div className="container">
@@ -24,9 +29,13 @@ const Home = () => {
           <Button onClick={handleTogglePostModal} variant="primary">
             Add Post
           </Button>
-          <PostModal show={showPostModal} handleClose={handleTogglePostModal} />
+          <PostModal
+            handleSuccess={handleSuccess}
+            show={showPostModal}
+            handleClose={handleTogglePostModal}
+          />
         </div>
-        <Posts />
+        <Posts refreshNumber={refreshNumber} />
       </main>
 
       <Footer />

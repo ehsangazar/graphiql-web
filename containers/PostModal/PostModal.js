@@ -2,27 +2,46 @@ import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import { useState } from 'react'
+import { gql, useMutation } from '@apollo/client'
 
-const PostModal = ({
-  show,
-  handleClose
-}) => {
-  const [form,setForm] = useState({})
-  const handleChange = (event,name) => {
+const CREATE_POST = gql`
+  mutation CREATE_POST($url: String!, $title: String!, $description: String!) {
+    createPost(url: $url, title: $title, description: $description) {
+      title
+      id
+      description
+      url
+    }
+  }
+`
+
+const PostModal = ({ show, handleClose, handleSuccess }) => {
+  const [form, setForm] = useState({})
+  const [addPost] = useMutation(CREATE_POST)
+
+  const handleChange = (event, name) => {
     setForm({
       ...form,
-      [name]:event.target.value
+      [name]: event.target.value,
     })
   }
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     if (event) event.preventDefault()
-    console.log('form',form)
+    await addPost({
+      variables: {
+        title: form.title,
+        url: form.url,
+        description: form.description,
+      },
+    })
+    handleSuccess()
   }
+
   return (
     <Modal show={show} onHide={handleClose}>
       <Form onSubmit={handleSubmit}>
         <Modal.Header closeButton>
-          <Modal.Title>Modal title</Modal.Title>
+          <Modal.Title>Add Post</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -56,7 +75,7 @@ const PostModal = ({
         <Modal.Footer>
           <Button variant="secondary">Close</Button>
           <Button variant="primary" type="submit">
-            Save changes
+            Submit
           </Button>
         </Modal.Footer>
       </Form>
